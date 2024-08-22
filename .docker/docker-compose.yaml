@@ -1,0 +1,43 @@
+name: lexicom
+
+services:
+  redis:
+    image: redis:alpine
+    container_name: redis
+    hostname: redis
+    env_file:
+      - .env
+    ports:
+      - "6379:6379"
+
+  postgres:
+    image: postgres:alpine
+    container_name: postgres
+    hostname: postgres
+    volumes:
+      - ./data/postgres:/dumps
+    ports:
+      - "5432:5432"
+    env_file:
+      - .env
+    healthcheck:
+      test: [ "CMD-SHELL", "sh -c 'pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}'" ]
+      interval: 5s
+      timeout: 20s
+      retries: 100
+
+  app:
+    container_name: app
+    build:
+      context: ..
+      dockerfile: .docker/Dockerfile
+    hostname: app
+    env_file:
+      - .env
+    entrypoint: >
+      sh -c "alembic upgrade head && uvicorn src.main:app --host 0.0.0.0 --port 8080"
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
