@@ -1,5 +1,7 @@
 [Текст задания](https://github.com/polecie/lexicom/blob/main/src/task.md)
 
+Суть: Разработать рестфул сервис + написать запросы к таблицам
+
 ## Настройка окружения
 Создайте файл .env в папке .docker по образцу .env.example
 
